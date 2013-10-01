@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ -f "rnMRA" ]
+then
+    echo "RN is up to date."
+else
+    g++ RNMain.cpp msl/MSL_CMatrix.cpp msl/MSL_CMatrix_SparseW.cpp msl/MSL_CMatrix_Dense.cpp msl/ML_Utils.cpp clusterclasses.cpp msl/MSL_Stats1D.cpp -o rnMRA  -DMRA_SOLVER -O2 
+fi

@@ -1,0 +1,225 @@
+1. INTRODUCTION
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This source code is developed for various types of community detection. It
+supports:
+
+- Constant Potts Model (CPM) resolution free community detection
+- Modularity optimization
+- Reichardt-Bornholdt model with Erdos-Renyi null-model
+- Dealing with negative link (i.e. with negative weights)
+- Tuneable resolution parameters
+- Multislice community detection
+- Some basic parallel implementation, not very efficient
+
+The whole source code builds upon the idea of the Louvain method, as detailed in
+V. Blondel, J.-L. Guillaume, R. Lambiotte, E. Lefebvre, "Fast
+unfolding of community hierarchies in large networks", Journal of Statistichal
+Mechanics (2008), P100008, and is built on the original source code as can be
+found on http://sites.google.com/site/findcommunities/.
+
+More specifically, a variation of the code has been made, so as to allow
+community detection using the Erdos-Renyi null model, or the resolution-free
+Constant Potts Model (the implementation for the both is the same). The paper on
+resolution-free community detection can be found on the arXiv
+
+V.A. Traag, P. Van Dooren, Y. Nesterov, "Narrow scope for resolution-free
+community detection" (2011) arXiv:1104.3083v1.
+
+You are welcome to use this software for any purpose you like. You may adapt it
+to suit your specific needs, or change it to build further on it. The software
+is licensed under GNU licensing, please refer to the actual license for more
+information. Please take this into account when developing software using this
+package. For randomization we rely on a Mersenne Twister implementation, please
+refer to the source code and accompanying text for more information.
+
+2. COMPILING
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Before compiling make sure your environment is setup to compile correctly using
+the 'make' program. For windows users this means installing cygwin or the like.
+Please refer to http://cygwin.com/ for more details on this.
+
+Second, there is some multithreading built into this implementation, although
+this feature is still highly experimental, and currently not used by default,
+and is not compiled by default. If you do want to experiment around with some
+threads support, make sure THREAD_SUPPORT is defined in greedy_louvain.h, and
+link against the POSIX thread library (pthread). If you have no idea what this
+all means, then don't try it.
+
+In order to compile, simply extract the .tar.gz (as you have been able to do,
+since this README is contained within), and type
+
+> make
+
+There is no "make install", and the binary executables are located in the bin/
+subdirectory. 
+
+3. USAGE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+There are two programs: 
+  (1) community, that runs the actual algorithm; and 
+  (2) slicer, that changes a network text file to a binary representation
+
+The slicer program is used to create actually a bunch of things:
+  - Binary network representation
+  - Node mapping (which node is mapped to which internal node number)
+  - Configuration file
+
+  3.1 Slicer
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  The binary network representation is a sort of compressed format, that allows
+  for certain fast operations, such a number of incoming/outgoing neighbours,
+  etc. The program "slicer" converts a slice representation, where multiple
+  nodes are present in various nodes, to a layered representation, where all
+  nodes are unique. For example, whenever you have "node 1" in "slice 1" and
+  in "slice 2", it will create two nodes: "node 1" and "node 2", with the
+  links between these different nodes appropriately translated as well. This
+  translation is output in the "Node Map" file.
+
+  Since there might be multiple slice, the type of model can differ per slice.
+  For one slice you for example want to use the configuration null model (i.e.
+  modularity), while for others you may want to use the CPM null model. If you
+  specify the -C option to the slicer program, it will output a configuration
+  such that the CPM model is applied, otherwise the configuration null model is
+  used (i.e. modularity).
+
+  Also, the "slicer" program takes care automatically of any negative weights it
+  detect, by creating another "layer", for which the optimization works the
+  other way around (i.e. not minimizing energy, but maximizing).
+
+  To use the example, change to the sample_networks/ directory and type:
+
+  > ../bin/slicer -i example.txt -o example.bin -n example.node.txt -c example.conf
+
+  A short overview of the used commands and help, type 
+
+  > ../bin/slicer -h
+
+  The input format for the original text file is: 
+ 
+  ===============================================
+    >
+    <node_id> <node_name>
+    >
+    <slice_id> <slice_name>
+    >
+    <from_node> <to_node> <weight> <slice_id>
+  ===============================================
+  
+
+  3.2 Community
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  The community program executes the actual program, by passing it both the
+  binary network file, and the configuration file. To use the example, first run
+  the slicer program, as mentioned above, and then type
+
+  > ../bin/community example.bin example.conf
+
+  and the detection community configuration will be output to standard output.
+  By using '>' you can redirect this, as usual, to a text file if desired. 
+
+  For a short overview of the used commands and help, type:
+
+  > ../bin/community -h
+
+4. TECHNICAL DETAILS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If you want to go ahead and delve into the source code yourself, perhaps
+adapting it to your favorite environment (MATLAB, Python, etc...), some
+technical details might come in handy. For normal usage, you shouldn't need
+them, but for some intensive tasks, you might need to resort to them as well. In
+here we briefly describe these technicalities. 
+
+  4.1 Binary format
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  The binary format is a reasonably compact representation of the (multi-slice)
+  graph. The original format used in the original implementation was somwehat
+  simpler, and this is expanded to allow for multi-slices, negative links and
+  different null models. The format basically consists of an array of the
+  cumulative degree distribution, followed by the outgoing links and finally the
+  weights. To allow for directed links, both the incoming links and outgoing
+  links are recorded (so indeed, they are recorded twice for computational
+  efficiency). 
+  
+  To deal with multiple slices, everything is then recorded per 'layer'. These
+  are almost the same thing as slices, but they can overlap. That is, all the
+  nodes that are the same, but are present in different layers, will be made a
+  single unique new node (the 'node-slice' combination), with links changed
+  appropriately.
+
+  Basically then, the format comes down to the following:
+
+    Name                  Length
+    is_weighted           int
+    is_directed           int
+    nb_nodes              int
+    nb_layers             int
+    cum_degrees           nb_nodes*nb_layers*(is_directed + 1)*int
+    links                 nb_links*2*int
+    weights               nb_links*2*double
+
+  where nb_links=degrees[nb_nodes*nb_layers*(is_directed + 1) - 1] is the last
+  entry of the cumulative degrees. The int and double can be system dependent
+  defined, so it is not guaranteed that all binary files will always be alike on
+  different systems, although for most common cases this shouldn't present a
+  problem.
+
+  Each entry of the cum_degrees represent the degree dependent on the layer and
+  the direction, and is calculated as 
+
+  degree_index = node*nb_layers*(is_directed+1)   //dimension 1 - node      
+                 + layer*(is_directed+1)          //dimension 2 - layer
+                 + direction*is_directed;         //dimension 3 - direction
+
+  Then, the links array contains the nodes at the other end of the link
+  (start or end, depending on whether it is an incoming or outgoing link) from
+  cum_degrees[degree_index-1] to cum_degrees[degree_index], where
+  cum_degrees[-1]=0 so to speak. The weights are similarly defined.
+
+
+  4.1 Configuration format
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  The configuration file is also in binary format.
+
+    Name                  Length
+    nb_layers             int
+    conf                  nb_layers*int
+    sign                  nb_layers*int
+
+  where conf represent the model used for each layer, with
+
+    Name        Value     Description
+    NO_NULL     1         No null model, i.e. 
+                              
+                              H = - sum A_ij * d(s_i,s_j)
+
+    ER_NULL     2         Erdos-Renyi null model, i.e. 
+
+                              H = - sum (A_ij - g*p)*d(s_i,s_j)
+
+                          with g the resolution parameter and p the probability
+                          of an edge.
+
+    CONF_NULL   3         Configuration null model, i.e.
+
+                              H = - sum (A_ij - g*k_i*k_j/(2*m)) * d(s_i,s_j)
+
+                          with g the resolution parameter, k_i the degree of
+                          node i, and m the number of edges. This is
+                          automatically adjusted for directed networks.
+                            
+    FIXED_NULL  4         Constant Potts Model, i.e.
+
+                              H = - sum (A_ij - g) * d(s_i,s_j)
+
+                          with g the resolution parameter.
+    
+    The sign is either -1 for negative links, and +1 for positive links. The
+    only thing this effects is whether to take -H or H as a contribution, thus
+    allowing for appropriate community detection in networks having negative
+    links.
+ 
+5. QUESTION & CONTACT
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If you have any questions or comments regarding this implementation, do not
+hesitate to mail to Vincent Traag at vincent (dot) traag (at) uclouvain (dot)
+be. Please mention you are mailing about this software package.

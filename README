@@ -1,0 +1,155 @@
+* SurpriseMe - An integrated tool for network community structure
+characterization using Surprise maximization * 
+----------------------------------------------------------------------
+
+SurpriseMe is a free, open source software for detecting community structure
+in networks. The program uses Surprise to evaluate the outputs of 7 high-
+quality community detection algorithms. It also generates distance matrices
+that allow to visualize the relationships among the solutions generated.
+
+If you use this software, please cite:
+
+  ARXIV REFERENCE
+
+
+License
+=======
+
+Copyright (C) 2013  Rodrigo Aldecoa and Ignacio Marín
+This software is distributed under the GNU General Public License
+version 3.0 (GPLv3). You should have received a copy of this license
+with the program. Also, it can be found online at
+http://www.opensource.org/licenses/gpl-3.0.html.
+
+Version
+=======
+
+SupriseMe 1.0
+
+
+Interesting related papers
+==========================
+
+For more information about Surprise, please check out:
+
+* "Deciphering network community structure by Surprise".
+  Rodrigo Aldecoa and Ignacio Marín.
+  PloS ONE 6, e24195 (2011).
+  http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0024195
+  
+
+and:
+
+* "Surprise maximization reveals the community structure of complex networks".
+  Rodrigo Aldecoa and Ignacio Marín.
+  Scientific Reports 3, 1060 (2013).
+  http://www.nature.com/srep/2013/130114/srep01060/full/srep01060.html
+
+
+
+Programs included in this distribution
+======================================
+
+The following algorithms are included in SurpriseMe. If you use their solutions
+in your publications, please cite them appropriately:
+
+CPM: "Narrow scope for resolution-limit-free community detection"
+     Traag VA, Van Dooren P, Nesterov Y
+     Phys. Rev. E 84, 016114 (2011)
+
+Infomap: "Maps of random walks on complex networks reveal community structure"
+	 Rosvall M, Bergstrom CT
+	 Proc. Natl. Acad. Sci. USA 105, 1118 (2008)
+
+RB: "Statistical mechanics of community detection"
+    Reichardt J, Bornholdt S
+    Phys. Rev. E 74, 016110 (2006)
+
+RN: "Local resolution-limit-free Potts model for community detection"
+    Ronhovde P, Nussinov Z
+    Phys. Rev. E 81, 046114 (2010)
+
+RNSC: "Protein complex prediction via cost-based clustering"
+      King AD, Przulj N, Jurisica I
+      Bioinformatics 20, 3013 (2004)
+
+SCluster: "Jerarca: efficient analysis of complex networks using hierarchical clustering"
+	  Aldecoa R, Marin I
+	  Plos ONE 5, e11585 (2010)
+
+UVCluster: "Iterative cluster analysis of protein interaction data"
+	   Arnau V, Mars S, Marin I
+	   Bioinformatics 21, 364 (2005)
+	   (and also the same reference as SCluster)
+
+
+Compilation
+===========
+
+Note: The code should compile in any Linux distribution using its basic,
+standard libraries.
+
+
+Unzip the tar.gz file and enter the directory:
+
+  tar -xvzf SurpriseMe.tar.gz
+  cd SurpriseMe
+
+Build and compile the program:
+
+  make
+
+
+
+Usage
+=====
+
+Once the program is compiled, just run:
+
+  ./SurpriseMe.pl networkFile
+  
+where networkFile is the file containing the network to be analyzed.
+Each line of network_file should be of the form
+
+  id_1 id_2
+
+if node with id_1 is connected with node with id_2. Links are assumed 
+bidirectional, so that if id_1 id_2 is present in networkFile then 
+id_2 id_1 should not be present. Some examples of this format can be
+seen in the net_examples folder.
+
+
+Example:
+./SurpriseMe net_examples/sample.pairs
+
+
+
+Output files
+=============
+
+The execution of the program creates the following files:
+
+- networkFile.S			Contains the value of Surprise for the 
+				solution of each algorithm.
+				
+- networkFile_algorithm.part	Partition obtained by an algorithm.
+				
+- networkFile_VI.meg		MEGA (www.megasoftware.net) input file.
+				Contains the distance matrix of all
+				solutions. Uses the Variation of
+				Information as a distance between partitions.
+				
+- networkFile_1-NMI.meg		MEGA (www.megasoftware.net) input file.
+				Contains the distance matrix of all
+				solutions. Uses (1 minus the Normalized
+				Mutual Information) as a distance between
+				partitions.
+
+
+Resources. Report bugs or suggestions
+=====================================
+
+* Homepage: https://github.com/raldecoa/SurpriseMe
+
+* Email: Rodrigo Aldecoa <raldecoa (at) ibv.csic.es>
+	 Ignacio Marín   <imarin (at) ibv.csic.es>
