@@ -7,11 +7,11 @@ in networks. The program uses Surprise to evaluate the outputs of 7 high-
 quality community detection algorithms. It also generates distance matrices
 that allow to visualize the relationships among the solutions generated.
 
-If you use this software, please cite:
+You can find more information here:
 
-  ARXIV REFERENCE
+  arxiv.org/abs/1310.2357
 
-
+  
 License
 =======
 
@@ -133,6 +133,8 @@ The execution of the program creates the following files:
 				solution of each algorithm.
 				
 - networkFile_algorithm.part	Partition obtained by an algorithm.
+				Each line contains the name of a node
+				and its corresponding community
 				
 - networkFile_VI.meg		MEGA (www.megasoftware.net) input file.
 				Contains the distance matrix of all
