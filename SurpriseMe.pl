@@ -20,18 +20,28 @@ use strict;
 use warnings;
 use threads;
 
+# Here is the list of algorithms you can use:
+# my @algs = ( "UVCluster", "RN", "CPM", "RB", "Infomap", "RNSC", "SCluster" );
+# SurpriseMe runs all 7 algorithms by default. In case you want to run
+# only some of them, you can modify the line below:
+my @algs = ( "UVCluster", "RN", "CPM", "RB", "Infomap", "RNSC", "SCluster" );
+
+
+
+# Open File
 if(scalar @ARGV != 1){
     print "No network file specified!\n";
     print "Usage: ./SurpriseMe.pl network_file\n";
     exit();
 } 
 
-my $maxThreads = 3;
-my @algs = ( "UVCluster", "RN", "CPM", "RB", "Infomap", "RNSC", "SCluster" );
 my $f = $ARGV[0];
 open F, $f or die "Network file $f not found!";
 close F;
 
+
+
+my $maxThreads = 3;
 ## Reduce number of threads for low CPUs
 #if(scalar @lines > 10000){
 #    $maxThreads = 1;
@@ -171,6 +181,7 @@ for(my $i = 1; $i < scalar @algs; $i++){
 close O;
 
 
+# Functions
 sub runIt{
     my $name = shift @_;
     my $f = shift @_;

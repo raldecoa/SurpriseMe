@@ -146,8 +146,17 @@ The execution of the program creates the following files:
 				solutions. Uses (1 minus the Normalized
 				Mutual Information) as a distance between
 				partitions.
+				
+
+How to run only certain algorithms
+==================================
+
+You can modify line 27 in SurpriseMe.pl in order to run only a few algorithms.
+By default, the program runs all of them. Just remove from the array @algs
+those you want to exclude from the analysis.
 
 
+				
 Resources. Report bugs or suggestions
 =====================================
 
