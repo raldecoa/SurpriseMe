@@ -129,13 +129,14 @@ for(my $i = 0; $i < scalar @algs; $i++){
     }
 }
 
+my $NTaxa = scalar @algs;
 # Write distance matrixVI to file
 $out = $f;
 $out =~ s/\.\w+$/\_VI.meg/;
 open O, ">$out";
 print O "#MEGA\n";
 print O "!TITLE=$f;\n";
-print O "!Format Datatype=distance Dataformat=lowerleft;\n";
+print O "!Format Datatype=distance NTaxa=$NTaxa;\n";
 print O "!Description;\n";
 foreach(@algs){
     print O "#$_\_{".$S{$_}."}\n";
@@ -155,13 +156,13 @@ for(my $i = 1; $i < scalar @algs; $i++){
 close O;
 
 
-# Write distance matrixVI to file
+# Write distance matrix1-NMI to file
 $out = $f;
 $out =~ s/\.\w+$/\_1-NMI.meg/;
 open O, ">$out";
 print O "#MEGA\n";
 print O "!TITLE=$f;\n";
-print O "!Format Datatype=distance Dataformat=lowerleft;\n";
+print O "!Format Datatype=distance NTaxa=$NTaxa;\n";
 print O "!Description;\n";
 foreach(@algs){
     print O "#$_\_{".$S{$_}."}\n";
