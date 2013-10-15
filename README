@@ -87,7 +87,7 @@ Compilation
 ===========
 
 Note: The code should compile in any Linux distribution using its basic,
-standard libraries.
+standard libraries (g++, make...).
 
 
 Unzip the tar.gz file and enter the directory:
