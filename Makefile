@@ -12,9 +12,6 @@ OBJSURPRISE = $(SRC_DIR)/Surprise/computeSurprise.o $(SRC_DIR)/scripts/VI.o
 
 all: $(EXEC)
 
-src/Surprise/asdf : $(OBJSURPRISE)
-	$(CXX) -o $@ $^ $(CXXFLAGS)
-
 Jerarca :
 	cd src/Jerarca; make -j
 
