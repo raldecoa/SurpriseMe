@@ -123,7 +123,7 @@ bool sumLogProbabilities(const double& nextLogP, double& logP)
   logP = common + ( (log(1 + pow(10, diffExponent))) / log(10) );
   
   // The cumulative summation stops when the increasing is less than 10e-4
-  if(nextLogP - logP > -4)
+  if(nextLogP - logP < -4)
     return true;
   
   return false;
